@@ -41,7 +41,7 @@ class A2C(PolicyGradientAlgo):
         self.optimizer.step()
         opt_info = OptInfo(
             loss=loss.item(),
-            gradNorm=grad_norm,
+            gradNorm=grad_norm.item(),
             entropy=entropy.item(),
             perplexity=perplexity.item(),
         )
