@@ -9,7 +9,7 @@ from rlpyt.algos.pg.ppo import PPO
 from rlpyt.runners.minibatch_rl import MinibatchRlEval
 from rlpyt.utils.logging.context import logger_context
 
-from rlpyt.agents.pg.cartpole import CartpoleFfAgent
+from rlpyt.agents.pg.cartpole import CartpoleBasisAgent
 
 from ops import get_agent_cls_cartpole
 
@@ -49,9 +49,15 @@ def build_and_train(env_id="CartPole-v1", run_ID=0, cuda_idx=None,
 
     agentCls, agent_basis = get_agent_cls_cartpole(args.network)
 
-    agent = agentCls(model_kwargs={'fc_sizes': args.fcs,
-                                   'gain_type': args.gain_type,
-                                   'basis': agent_basis})
+    if agentCls is CartpoleBasisAgent:
+        agent = agentCls(model_kwargs={'fc_sizes': args.fcs,
+                                    'gain_type': args.gain_type,
+                                    'basis': agent_basis,
+                                    'const': args.const})
+    else:
+        agent = agentCls(model_kwargs={'fc_sizes': args.fcs,
+                                    'gain_type': args.gain_type,
+                                    'basis': agent_basis})
     runner = MinibatchRlEval(
         algo=algo,
         agent=agent,
@@ -61,13 +67,16 @@ def build_and_train(env_id="CartPole-v1", run_ID=0, cuda_idx=None,
         affinity=affinity,
     )
 
-
     config = dict(env_id=env_id, lr=args.lr,
                   gain_type=args.gain_type, debug=False,
-                  network=args.network, fcs=str(args.fcs))
-
-    name = f"{args.folder}_{args.network}"
-    log_dir = f"{args.folder}_{args.network}"
+                  network=args.network, fcs=str(args.fcs), const=args.const)
+    
+    if agentCls is CartpoleBasisAgent:
+        name = f"{args.folder}_{args.network}_{args.const}"
+        log_dir = f"{args.folder}_{args.network}_{args.const}"
+    else:
+        name = f"{args.folder}_{args.network}"
+        log_dir = f"{args.folder}_{args.network}"
     with logger_context(log_dir, run_ID, name, config):
         runner.train()
 
@@ -84,6 +93,7 @@ if __name__ == "__main__":
     parser.add_argument('--gain_type', type=str, default='xavier',
                         help='Gain type [xavier, he]')
     parser.add_argument('--fcs', type=int, nargs='+', default=[64, 64])
+    parser.add_argument('--const', help='const in num_samples = const*num_param/group_size', default=2.0, type=float)
 
     parser.add_argument('--run_ID', help='run identifier (logging)', type=int, default=0)
     parser.add_argument('--cuda_idx', help='gpu to use ', type=int, default=None)

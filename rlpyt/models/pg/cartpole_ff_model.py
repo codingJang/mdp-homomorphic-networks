@@ -2,7 +2,7 @@
 Adaptation of the Atari model class to suit CartPole-v1 and enable the use of
 basis networks.
 """
-
+import math
 import torch
 import torch.nn.functional as F
 
@@ -73,21 +73,21 @@ class CartpoleBasisModel(torch.nn.Module):
             fc_sizes=[45, 45],
             basis="equivariant",
             gain_type="default",
+            const=2.0,
             ):
         super(CartpoleBasisModel, self).__init__()
         input_size = image_shape[0]
         input_size = 1
-
-
+        
         self.head = BasisCartpoleNetworkWrapper(input_size, fc_sizes,
                                              gain_type=gain_type,
-                                             basis=basis)
+                                             basis=basis, const=const)
         self.pi = BasisCartpoleLayer(fc_sizes[-1], 1,
                                          gain_type=gain_type,
-                                         basis=basis)
+                                         basis=basis, const=const)
         self.value = BasisCartpoleLayer(fc_sizes[-1], 1,
                                             gain_type=gain_type,
-                                            basis=basis, out="invariant")
+                                            basis=basis, const=const, out="invariant")
 
     def forward(self, in_state, prev_action, prev_reward):
         """Feedforward layers process as [T*B,H]. Return same leading dims as
