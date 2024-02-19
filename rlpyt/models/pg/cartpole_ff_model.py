@@ -73,21 +73,21 @@ class CartpoleBasisModel(torch.nn.Module):
             fc_sizes=[45, 45],
             basis="equivariant",
             gain_type="default",
-            const=2.0,
+            const=2.0,  #EDIT# const 인자 추가
             ):
         super(CartpoleBasisModel, self).__init__()
         input_size = image_shape[0]
         input_size = 1
-        
+        #EDIT# Network와 Layer의 차이 유념하기 (네트워크는 레이어 여러개로 구성)
         self.head = BasisCartpoleNetworkWrapper(input_size, fc_sizes,
                                              gain_type=gain_type,
-                                             basis=basis, const=const)
+                                             basis=basis, const=const)  #EDIT# const 인자 추가. BasisCartpoleNetworkWrapper Ctrl+Click하기.
         self.pi = BasisCartpoleLayer(fc_sizes[-1], 1,
                                          gain_type=gain_type,
-                                         basis=basis, const=const)
+                                         basis=basis, const=const)  #EDIT# const 인자 추가. BasisCartpoleLayer Ctrl+Click하기.
         self.value = BasisCartpoleLayer(fc_sizes[-1], 1,
                                             gain_type=gain_type,
-                                            basis=basis, const=const, out="invariant")
+                                            basis=basis, const=const, out="invariant")  #EDIT# const 인자 추가. BasisCartpoleLayer Ctrl+Click하기.
 
     def forward(self, in_state, prev_action, prev_reward):
         """Feedforward layers process as [T*B,H]. Return same leading dims as

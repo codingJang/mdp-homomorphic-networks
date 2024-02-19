@@ -49,7 +49,7 @@ def build_and_train(env_id="CartPole-v1", run_ID=0, cuda_idx=None,
 
     agentCls, agent_basis = get_agent_cls_cartpole(args.network)
 
-    if agentCls is CartpoleBasisAgent:
+    if agentCls is CartpoleBasisAgent:  #EDIT# 만약 에이전트 클래스가 CartpoleBasisAgent라면, 객체 생성 시 키워드 인자에 args.const를 추가함
         agent = agentCls(model_kwargs={'fc_sizes': args.fcs,
                                     'gain_type': args.gain_type,
                                     'basis': agent_basis,
@@ -71,9 +71,10 @@ def build_and_train(env_id="CartPole-v1", run_ID=0, cuda_idx=None,
                   gain_type=args.gain_type, debug=False,
                   network=args.network, fcs=str(args.fcs), const=args.const)
     
-    if agentCls is CartpoleBasisAgent:
-        name = f"{args.folder}_{args.network}_{args.const}"
-        log_dir = f"{args.folder}_{args.network}_{args.const}"
+    if agentCls is CartpoleBasisAgent:  #EDIT# 만약 에이전트 클래스가 CartpoleBasisAgent라면, 제목과 log_dir에 args.const를 추가함
+        name = f"{args.folder}_{args.network}_{str(args.fcs).replace(' ', '')}_{args.const}"
+        log_dir = f"{args.folder}_{args.network}_{str(args.fcs).replace(' ', '')}_{args.const}"
+        # breakpoint()
     else:
         name = f"{args.folder}_{args.network}"
         log_dir = f"{args.folder}_{args.network}"
