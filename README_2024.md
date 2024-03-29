@@ -1,7 +1,5 @@
 # Cloning MDP Homomorphic Networks repository in 2024
 
-The author uses a bunch of legacy packages and an outdated cudatoolkit (10.2) which makes the installation difficult.
-
 ## Installation
 * **Note:** Only tested for Linux, no guarantees for other operating systems. Atari doesn't work for now.
 * Create Conda environment and install the stable PyTorch build 2.1.2 along with CUDA 11.8:
