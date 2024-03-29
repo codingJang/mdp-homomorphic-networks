@@ -9,6 +9,8 @@ from rlpyt.algos.pg.a2c import A2C
 from rlpyt.runners.minibatch_rl import MinibatchRlEval, MinibatchRl
 from rlpyt.utils.logging.context import logger_context
 
+from rlpyt.agents.pg.grid import GridBasisAgent   #EDIT# GridBasisAgent import하기
+
 from ops import get_agent_cls_grid
 
 
@@ -45,12 +47,22 @@ def build_and_train(env_id="GridEnv-v1", run_ID=0, cuda_idx=None,
     algo = A2C(learning_rate=args.lr)
 
     agentCls, agent_basis = get_agent_cls_grid(args.network)
-    agent = agentCls(model_kwargs={'basis': agent_basis,
-                                   'channels': args.channels,
-                                   'kernel_sizes': args.filters,
-                                   'paddings': args.paddings,
-                                   'fc_sizes': args.fcs,
-                                   'strides': args.strides})
+    if agentCls is GridBasisAgent:   #EDIT# 만약 에이전트 클래스가 GridBasisAgent라면, 객체 생성 시 키워드 인자에 args.const를 추가함
+        agent = agentCls(model_kwargs={'basis': agent_basis,
+                                    'channels': args.channels,
+                                    'kernel_sizes': args.filters,
+                                    'paddings': args.paddings,
+                                    'fc_sizes': args.fcs,
+                                    'strides': args.strides,
+                                    'const': args.const,
+                                    'cconst': args.cconst})
+    else:
+        agent = agentCls(model_kwargs={'basis': agent_basis,
+                                    'channels': args.channels,
+                                    'kernel_sizes': args.filters,
+                                    'paddings': args.paddings,
+                                    'fc_sizes': args.fcs,
+                                    'strides': args.strides})
     runner = MinibatchRl(
         algo=algo,
         agent=agent,
@@ -63,9 +75,14 @@ def build_and_train(env_id="GridEnv-v1", run_ID=0, cuda_idx=None,
 
     config = dict(env_id=env_id, lr=args.lr, network=args.network,
                   fcs=str(args.fcs), channels=args.channels,
-                  strides=args.strides, paddings=args.paddings)
-    name = f"{args.folder}_{args.network}"
-    log_dir = f"{args.folder}_{args.network}"
+                  strides=args.strides, paddings=args.paddings, const=args.const, cconst=args.const)  #EDIT# const 추가
+    if agentCls is GridBasisAgent:  #EDIT# 만약 에이전트 클래스가 GridBasisAgent라면, 제목과 log_dir에 args.const를 추가함
+        name = f"{args.folder}_{args.network}_{str(args.fcs).replace(' ', '')}_{str(args.filters).replace(' ', '')}_{args.const}_{args.cconst}"
+        log_dir = f"{args.folder}_{args.network}_{str(args.fcs).replace(' ', '')}_{str(args.filters).replace(' ', '')}_{args.const}_{args.cconst}"
+        # breakpoint()
+    else:
+        name = f"{args.folder}_{args.network}"
+        log_dir = f"{args.folder}_{args.network}"
     with logger_context(log_dir, run_ID, name, config):
         runner.train()
 
@@ -89,6 +106,8 @@ if __name__ == "__main__":
     parser.add_argument('--sample_mode', help='serial or parallel sampling',
                         type=str, default='serial', choices=['serial', 'cpu', 'gpu', 'alternating'])
     parser.add_argument('--n_parallel', help='number of sampler workers', type=int, default=2)
+    parser.add_argument('--const', help='const in num_samples = const*num_param/group_size', default=2.0, type=float)   #EDIT# const 인자 추가
+    parser.add_argument('--cconst', help='cconst for convolutional layers', default=2.0, type=float)
     args = parser.parse_args()
     build_and_train(
         env_id=args.env_id,

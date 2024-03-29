@@ -17,9 +17,9 @@ class GridFfAgent(GridMixin, CategoricalPgAgent):
         super().__init__(ModelCls=ModelCls, **kwargs)
 
 
-class GridBasisAgent(GridMixin, CategoricalPgAgent):
+class GridBasisAgent(GridMixin, CategoricalPgAgent):   #EDIT# GridBasisModel Ctrl+Click하기
 
-    def __init__(self, ModelCls=GridBasisModel, **kwargs):
+    def __init__(self, ModelCls=GridBasisModel, **kwargs):   #EDIT# 어차피 키워드 인자는 그대로 전달됨
         super().__init__(ModelCls=ModelCls, **kwargs)
 
 

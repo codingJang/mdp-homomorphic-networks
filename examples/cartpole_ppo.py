@@ -9,7 +9,7 @@ from rlpyt.algos.pg.ppo import PPO
 from rlpyt.runners.minibatch_rl import MinibatchRlEval
 from rlpyt.utils.logging.context import logger_context
 
-from rlpyt.agents.pg.cartpole import CartpoleBasisAgent
+from rlpyt.agents.pg.cartpole import CartpoleBasisAgent   #EDIT# CartpoleBasisAgent import하기
 
 from ops import get_agent_cls_cartpole
 
@@ -69,7 +69,7 @@ def build_and_train(env_id="CartPole-v1", run_ID=0, cuda_idx=None,
 
     config = dict(env_id=env_id, lr=args.lr,
                   gain_type=args.gain_type, debug=False,
-                  network=args.network, fcs=str(args.fcs), const=args.const)
+                  network=args.network, fcs=str(args.fcs), const=args.const)  #EDIT# const 추가
     
     if agentCls is CartpoleBasisAgent:  #EDIT# 만약 에이전트 클래스가 CartpoleBasisAgent라면, 제목과 log_dir에 args.const를 추가함
         name = f"{args.folder}_{args.network}_{str(args.fcs).replace(' ', '')}_{args.const}"
@@ -94,7 +94,7 @@ if __name__ == "__main__":
     parser.add_argument('--gain_type', type=str, default='xavier',
                         help='Gain type [xavier, he]')
     parser.add_argument('--fcs', type=int, nargs='+', default=[64, 64])
-    parser.add_argument('--const', help='const in num_samples = const*num_param/group_size', default=2.0, type=float)
+    parser.add_argument('--const', help='const in num_samples = const*num_param/group_size', default=2.0, type=float)  #EDIT# const 인자 추가
 
     parser.add_argument('--run_ID', help='run identifier (logging)', type=int, default=0)
     parser.add_argument('--cuda_idx', help='gpu to use ', type=int, default=None)

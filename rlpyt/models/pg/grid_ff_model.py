@@ -59,12 +59,13 @@ class GridBasisModel(torch.nn.Module):
 
     def __init__(self, image_shape, output_size, fc_sizes=[512],
                  channels=[16, 32], kernel_sizes=[8, 5], strides=[4, 2],
-                 paddings=[0, 0], basis="equivariant", gain_type="he"):
+                 paddings=[0, 0], basis="equivariant", gain_type="he", const=2.0, cconst=2.0):
         super().__init__()
+        #EDIT# Network와 Layer의 차이 유념하기 (네트워크는 레이어 여러개로 구성)
         self.conv = BasisGridNetwork(1, channels=channels,
                                      filters=kernel_sizes, strides=strides,
                                      paddings=paddings, hidden_sizes=fc_sizes,
-                                     gain_type=gain_type, basis=basis)
+                                     gain_type=gain_type, basis=basis, const=const, cconst=cconst)    #EDIT# const 인자 추가. BasisGridNetwork Ctrl+Click하기.
 
 
     def forward(self, image, prev_action, prev_reward, imshow=False):
